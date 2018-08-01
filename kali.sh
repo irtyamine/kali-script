@@ -41,8 +41,8 @@ if [ 1 -eq 0 ]; then    # This is never true, thus it acts as block comments ;)
 ##########################################################################################
 ### One liner - Grab the latest version and execute! #####################################
 ##########################################################################################
-wget -qO kali.sh https://raw.githubusercontent.com/drkpasngr/kali-script/master/kali.sh \
-  && bash kali.sh -burp -timezone "US/Chicago"
+wget -qO kali.sh https://raw.githubusercontent.com/thesp0nge/kali-script/master/kali.sh \
+  && bash kali.sh -burp -timezone "Europe/Rome" --osx --keyboard it
 ##########################################################################################
 fi
 
@@ -150,13 +150,13 @@ export TERM=xterm
 
 
 ##### Are we using GNOME?
-#if [[ $(which gnome-shell) ]]; then
+if [[ $(which gnome-shell) ]]; then
 # ##### RAM check
-#  if [[ "$(free -m | grep -i Mem | awk '{print $2}')" < 2048 ]]; then
-#    echo -e '\n '${RED}'[!]'${RESET}" ${RED}You have <= 2GB of RAM and using GNOME${RESET}" 1>&2
-#    echo -e " ${YELLOW}[i]${RESET} ${YELLOW}Might want to use XFCE instead${RESET}..."
-#    sleep 15s
-#  fi
+  if [[ "$(free -m | grep -i Mem | awk '{print $2}')" < 2048 ]]; then
+    echo -e '\n '${RED}'[!]'${RESET}" ${RED}You have <= 2GB of RAM and using GNOME${RESET}" 1>&2
+    echo -e " ${YELLOW}[i]${RESET} ${YELLOW}Might want to use XFCE instead${RESET}..."
+    sleep 15s
+  fi
 
 
   ##### Disable its auto notification package updater
@@ -723,33 +723,6 @@ done
 
 
 
-##### Install ZSH & Oh-My-ZSH - root user.   Note:  'Open terminal here', will not work with ZSH.   Make sure to have tmux already installed
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ZSH${RESET} & ${GREEN}Oh-My-ZSH${RESET} ~ unix shell"
-apt -y -qq install zsh git curl \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-#--- Setup oh-my-zsh
-timeout 300 curl --progress -k -L -f "https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh" | zsh
-#--- Configure zsh
-file=~/.zshrc; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/zsh/zshrc
-([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
-grep -q 'interactivecomments' "${file}" 2>/dev/null \
-  || echo 'setopt interactivecomments' >> "${file}"
-grep -q 'ignoreeof' "${file}" 2>/dev/null \
-  || echo 'setopt ignoreeof' >> "${file}"
-grep -q 'correctall' "${file}" 2>/dev/null \
-  || echo 'setopt correctall' >> "${file}"
-grep -q 'globdots' "${file}" 2>/dev/null \
-  || echo 'setopt globdots' >> "${file}"
-grep -q '.bash_aliases' "${file}" 2>/dev/null \
-  || echo 'source $HOME/.bash_aliases' >> "${file}"
-grep -q '/usr/bin/tmux' "${file}" 2>/dev/null \
-  || echo '#if ([[ -z "$TMUX" && -n "$SSH_CONNECTION" ]]); then /usr/bin/tmux attach || /usr/bin/tmux new; fi' >> "${file}"   # If not already in tmux and via SSH
-#--- Configure zsh (themes) ~ https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-#sed -i 's/ZSH_THEME=.*/ZSH_THEME="mh"/' "${file}"   # Other themes: mh, jreese,   alanpeabody,   candy,   terminalparty, kardan,   nicoulaj, sunaku
-#--- Configure oh-my-zsh
-sed -i 's/plugins=(.*)/plugins=(git git-extras tmux dirhistory python pip)/' "${file}"
-#--- Set zsh as default shell (current user)
-chsh -s "$(which zsh)"
 
 
 ##### Install tmux - all users
@@ -839,42 +812,70 @@ grep -q '^alias tmux' "${file}" 2>/dev/null \
 #--- Apply new alias
 source "${file}" || source ~/.zshrc
 
+##### Install ZSH & Oh-My-ZSH - root user.   Note:  'Open terminal here', will not work with ZSH.   Make sure to have tmux already installed
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ZSH${RESET} & ${GREEN}Oh-My-ZSH${RESET} ~ unix shell"
+apt -y -qq install zsh git curl \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Setup oh-my-zsh
+timeout 300 curl --progress -k -L -f "https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh" | zsh
+#--- Configure zsh
+file=~/.zshrc; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/zsh/zshrc
+([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+grep -q 'interactivecomments' "${file}" 2>/dev/null \
+  || echo 'setopt interactivecomments' >> "${file}"
+grep -q 'ignoreeof' "${file}" 2>/dev/null \
+  || echo 'setopt ignoreeof' >> "${file}"
+grep -q 'correctall' "${file}" 2>/dev/null \
+  || echo 'setopt correctall' >> "${file}"
+grep -q 'globdots' "${file}" 2>/dev/null \
+  || echo 'setopt globdots' >> "${file}"
+grep -q '.bash_aliases' "${file}" 2>/dev/null \
+  || echo 'source $HOME/.bash_aliases' >> "${file}"
+grep -q '/usr/bin/tmux' "${file}" 2>/dev/null \
+  || echo '#if ([[ -z "$TMUX" && -n "$SSH_CONNECTION" ]]); then /usr/bin/tmux attach || /usr/bin/tmux new; fi' >> "${file}"   # If not already in tmux and via SSH
+#--- Configure zsh (themes) ~ https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+#sed -i 's/ZSH_THEME=.*/ZSH_THEME="mh"/' "${file}"   # Other themes: mh, jreese,   alanpeabody,   candy,   terminalparty, kardan,   nicoulaj, sunaku
+#--- Configure oh-my-zsh
+sed -i 's/plugins=(.*)/plugins=(git git-extras tmux dirhistory python pip)/' "${file}"
+#--- Set zsh as default shell (current user)
+chsh -s "$(which zsh)"
 
-##### Configure screen ~ if possible, use tmux instead!
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}screen${RESET} ~ multiplex virtual consoles"
-#apt -y -qq install screen \
-#  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-#--- Configure screen
-file=~/.screenrc; [ -e "${file}" ] && cp -n $file{,.bkup}
-if [[ -f "${file}" ]]; then
-  echo -e ' '${RED}'[!]'${RESET}" ${file} detected. Skipping..." 1>&2
-else
-  cat <<EOF > "${file}"
-## Don't display the copyright page
-startup_message off
 
-## tab-completion flash in heading bar
-vbell off
-
-## Keep scrollback n lines
-defscrollback 1000
-
-## Hardstatus is a bar of text that is visible in all screens
-hardstatus on
-hardstatus alwayslastline
-hardstatus string '%{gk}%{G}%H %{g}[%{Y}%l%{g}] %= %{wk}%?%-w%?%{=b kR}(%{W}%n %t%?(%u)%?%{=b kR})%{= kw}%?%+w%?%?%= %{g} %{Y} %Y-%m-%d %C%a %{W}'
-
-## Title bar
-termcapinfo xterm ti@:te@
-
-## Default windows (syntax: screen -t label order command)
-screen -t bash1 0
-screen -t bash2 1
-
-## Select the default window
-select 0
-EOF
-fi
+###### Configure screen ~ if possible, use tmux instead!
+#(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}screen${RESET} ~ multiplex virtual consoles"
+##apt -y -qq install screen \
+##  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+##--- Configure screen
+#file=~/.screenrc; [ -e "${file}" ] && cp -n $file{,.bkup}
+#if [[ -f "${file}" ]]; then
+#  echo -e ' '${RED}'[!]'${RESET}" ${file} detected. Skipping..." 1>&2
+#else
+#  cat <<EOF > "${file}"
+### Don't display the copyright page
+#startup_message off
+#
+### tab-completion flash in heading bar
+#vbell off
+#
+### Keep scrollback n lines
+#defscrollback 1000
+#
+### Hardstatus is a bar of text that is visible in all screens
+#hardstatus on
+#hardstatus alwayslastline
+#hardstatus string '%{gk}%{G}%H %{g}[%{Y}%l%{g}] %= %{wk}%?%-w%?%{=b kR}(%{W}%n %t%?(%u)%?%{=b kR})%{= kw}%?%+w%?%?%= %{g} %{Y} %Y-%m-%d %C%a %{W}'
+#
+### Title bar
+#termcapinfo xterm ti@:te@
+#
+### Default windows (syntax: screen -t label order command)
+#screen -t bash1 0
+#screen -t bash2 1
+#
+### Select the default window
+#select 0
+#EOF
+#fi
 
 
 ##### Install vim - all users
