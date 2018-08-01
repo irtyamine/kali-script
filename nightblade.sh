@@ -45,6 +45,6 @@ fi
 export DISPLAY=:0.0
 export TERM=xterm
 
-(( STAGE++ )); echo -e "\n\n${GREEN}[+]"${RESET} (${STAGE}/${TOTAL}) Setting hostname to nightblade""
+(( STAGE++ )); echo -e "${GREEN}[+] ${RESET} (${STAGE}/${TOTAL}) Setting hostname to nightblade"
 sed -i 's/kali/nightblade/g' /etc/hosts
 sed -i 's/kali/nightblade/g' /etc/hostname
