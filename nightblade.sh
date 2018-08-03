@@ -356,3 +356,98 @@ gsettings set org.gnome.shell.extensions.user-theme name "Qogir-win-light"
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Install ${GREEN}mouse theme${RESET}"
 apt install breeze-cursor-theme
 gsettings set org.gnome.desktop.interface cursor-theme "Breeze_Snow"
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}wallpaper${RESET}"
+mkdir -p ~/.config/wallpaper
+wget https://raw.githubusercontent.com/thesp0nge/kali-script/master/bg_emptiness.jpg
+mv bg_emptiness.jpg ~/.config/wallpaper
+gsettings set org.gnome.desktop.background picture-uri "file:///root/.config/wallpaper/bg_emptiness.jpg"
+gsettings set org.gnome.desktop.background picture-options "wallpaper"
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}tmux${RESET}"
+apt -y -qq install tmux \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+
+rm -rf .tmux
+cd
+git clone https://github.com/gpakosz/.tmux.git
+ln -s -f .tmux/.tmux.conf
+cp .tmux/.tmux.conf.local .
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}peda${RESET}"
+rm -rf .gdbinit
+git clone https://github.com/longld/peda.git ~/peda
+echo "source ~/peda/peda.py" >> ~/.gdbinit
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}pwntools${RESET}"
+pip intall pwntools
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}wpscan${RESET}"
+apt -y -qq install wpscan \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+wpscan --update
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Upgrade all packages"
+apt -y -qq update
+apt -y -qq upgrade
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}asciinema${RESET}"
+apt -y -qq install asciinema \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+
+##### Install metasploit ~ http://docs.kali.org/general-use/starting-metasploit-framework-in-kali
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}metasploit${RESET} ~ exploit framework"
+apt -y -qq install metasploit-framework \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+mkdir -p ~/.msf4/modules/{auxiliary,exploits,payloads,post}/
+#--- Fix any port issues
+file=$(find /etc/postgresql/*/main/ -maxdepth 1 -type f -name postgresql.conf -print -quit);
+[ -e "${file}" ] && cp -n $file{,.bkup}
+sed -i 's/port = .* #/port = 5432 /' "${file}"
+#--- Fix permissions - 'could not translate host name "localhost", service "5432" to address: Name or service not known'
+chmod 0644 /etc/hosts
+#--- Start services
+systemctl stop postgresql
+systemctl start postgresql
+msfdb reinit
+sleep 5s
+#--- Autorun Metasploit commands each startup
+file=~/.msf4/msf_autorunscript.rc; [ -e "${file}" ] && cp -n $file{,.bkup}
+if [[ -f "${file}" ]]; then
+  echo -e ' '${RED}'[!]'${RESET}" ${file} detected. Skipping..." 1>&2
+else
+  cat <<EOF > "${file}"
+#run post/windows/escalate/getsystem
+
+#run migrate -f -k
+#run migrate -n "explorer.exe" -k    # Can trigger AV alerts by touching explorer.exe...
+
+#run post/windows/manage/smart_migrate
+#run post/windows/gather/smart_hashdump
+EOF
+fi
+file=~/.msf4/msfconsole.rc; [ -e "${file}" ] && cp -n $file{,.bkup}
+if [[ -f "${file}" ]]; then
+  echo -e ' '${RED}'[!]'${RESET}" ${file} detected. Skipping..." 1>&2
+else
+  cat <<EOF > "${file}"
+
+load alias
+alias del rm
+alias handler use exploit/multi/handler
+
+load sounds
+
+setg TimestampOutput true
+setg VERBOSE true
+
+EOF
+#setg AutoRunScript 'multi_console_command -rc "~/.msf4/msf_autorunscript.rc"'
+fi
+
+(( STAGE++ )); echo -e " ${GREEN}[i]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Starting Metasploit for the first time${RESET} ~ this ${BOLD}will take a ~350 seconds${RESET} (~6 mintues)"
+echo "Started at: $(date)"
+systemctl start postgresql
+msfdb start
+msfconsole -x 'version;db_status;sleep 310;exit'
+
