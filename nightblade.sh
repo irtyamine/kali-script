@@ -13,6 +13,7 @@ YELLOW="\033[01;33m"   # Warnings/Information
 BLUE="\033[01;34m"     # Heading
 BOLD="\033[01;01m"     # Highlight
 RESET="\033[00m"       # Normal
+VERSION="20181205"
 
 STAGE=0                                                         # Where are we up to
 TOTAL=$( grep '(${STAGE}/${TOTAL})' $0 | wc -l );(( TOTAL-- ))  # How many things have we got todo
@@ -20,6 +21,7 @@ TOTAL=$( grep '(${STAGE}/${TOTAL})' $0 | wc -l );(( TOTAL-- ))  # How many thing
 
 timezone="Europe/Rome"
 
+echo -e "${YELLOW}[i]${RESET} $0 version $VERSION"
 ##### Check if we are running as root - else this script will fail (Hard!)
 if [[ "${EUID}" -ne 0 ]]; then
   echo -e ' '${RED}'[!]'${RESET}" This script must be ${RED}run as root${RESET}" 1>&2
@@ -359,8 +361,8 @@ gsettings set org.gnome.desktop.interface cursor-theme "Breeze_Snow"
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}wallpaper${RESET}"
 mkdir -p ~/.config/wallpaper
-wget https://raw.githubusercontent.com/thesp0nge/kali-script/master/bg_emptiness.jpg
-mv bg_emptiness.jpg ~/.config/wallpaper
+wget -r https://raw.githubusercontent.com/thesp0nge/kali-script/master/wallpaper/ -O ~/.config/wallpaper/
+
 gsettings set org.gnome.desktop.background picture-uri "file:///root/.config/wallpaper/bg_emptiness.jpg"
 gsettings set org.gnome.desktop.background picture-options "wallpaper"
 
@@ -687,6 +689,7 @@ echo -e " ${YELLOW}[i]${RESET} + Check the above output (Did everything install?
 echo -e " ${YELLOW}[i]${RESET} + Manually install: Nessus, Nexpose, and/or Metasploit Community"
 echo -e " ${YELLOW}[i]${RESET} + Agree/Accept to: Maltego, OWASP ZAP, w3af, PyCharm, etc"
 echo -e " ${YELLOW}[i]${RESET} + Setup git:   ${YELLOW}git config --global user.name <name>;git config --global user.email <email>${RESET}"
+echo -e " ${YELLOW}[i]${RESET} + Please add 'source /usr/share/powerline/bindings/tmux/powerline.conf' to $HOME/.tmux.conf"
 echo -e " ${YELLOW}[i]${RESET} + ${BOLD}Change default passwords${RESET}: PostgreSQL/MSF, MySQL, OpenVAS, BeEF XSS, etc"
 echo -e " ${YELLOW}[i]${RESET} + ${YELLOW}Reboot${RESET}"
 (dmidecode | grep -iq virtual) \
