@@ -451,3 +451,246 @@ systemctl start postgresql
 msfdb start
 msfconsole -x 'version;db_status;sleep 310;exit'
 
+##### Install grc
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}grc${RESET} ~ colours shell output"
+apt -y -qq install grc \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Setup aliases
+file=~/.bash_aliases; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/bash.bash_aliases
+([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+grep -q '^## grc diff alias' "${file}" 2>/dev/null \
+  || echo -e "## grc diff alias\nalias diff='$(which grc) $(which diff)'\n" >> "${file}"
+grep -q '^## grc dig alias' "${file}" 2>/dev/null \
+  || echo -e "## grc dig alias\nalias dig='$(which grc) $(which dig)'\n" >> "${file}"
+grep -q '^## grc gcc alias' "${file}" 2>/dev/null \
+  || echo -e "## grc gcc alias\nalias gcc='$(which grc) $(which gcc)'\n" >> "${file}"
+grep -q '^## grc ifconfig alias' "${file}" 2>/dev/null \
+  || echo -e "## grc ifconfig alias\nalias ifconfig='$(which grc) $(which ifconfig)'\n" >> "${file}"
+grep -q '^## grc mount alias' "${file}" 2>/dev/null \
+  || echo -e "## grc mount alias\nalias mount='$(which grc) $(which mount)'\n" >> "${file}"
+grep -q '^## grc netstat alias' "${file}" 2>/dev/null \
+  || echo -e "## grc netstat alias\nalias netstat='$(which grc) $(which netstat)'\n" >> "${file}"
+grep -q '^## grc ping alias' "${file}" 2>/dev/null \
+  || echo -e "## grc ping alias\nalias ping='$(which grc) $(which ping)'\n" >> "${file}"
+grep -q '^## grc ps alias' "${file}" 2>/dev/null \
+  || echo -e "## grc ps alias\nalias ps='$(which grc) $(which ps)'\n" >> "${file}"
+grep -q '^## grc tail alias' "${file}" 2>/dev/null \
+  || echo -e "## grc tail alias\nalias tail='$(which grc) $(which tail)'\n" >> "${file}"
+grep -q '^## grc traceroute alias' "${file}" 2>/dev/null \
+  || echo -e "## grc traceroute alias\nalias traceroute='$(which grc) $(which traceroute)'\n" >> "${file}"
+grep -q '^## grc wdiff alias' "${file}" 2>/dev/null \
+  || echo -e "## grc wdiff alias\nalias wdiff='$(which grc) $(which wdiff)'\n" >> "${file}"
+#configure  #esperanto  #ldap  #e  #cvs  #log  #mtr  #ls  #irclog  #mount2  #mount
+#--- Apply new aliases
+source "${file}" || source ~/.zshrc
+
+##### Install ZSH & Oh-My-ZSH - root user.   Note:  'Open terminal here', will not work with ZSH.   Make sure to have tmux already installed
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ZSH${RESET} & ${GREEN}Oh-My-ZSH${RESET} ~ unix shell"
+apt -y -qq install zsh git curl \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Setup oh-my-zsh
+timeout 300 curl --progress -k -L -f "https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh" | zsh
+#--- Configure zsh
+file=~/.zshrc; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/zsh/zshrc
+([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+grep -q 'interactivecomments' "${file}" 2>/dev/null \
+  || echo 'setopt interactivecomments' >> "${file}"
+grep -q 'ignoreeof' "${file}" 2>/dev/null \
+  || echo 'setopt ignoreeof' >> "${file}"
+grep -q 'correctall' "${file}" 2>/dev/null \
+  || echo 'setopt correctall' >> "${file}"
+grep -q 'globdots' "${file}" 2>/dev/null \
+  || echo 'setopt globdots' >> "${file}"
+grep -q '.bash_aliases' "${file}" 2>/dev/null \
+  || echo 'source $HOME/.bash_aliases' >> "${file}"
+grep -q '/usr/bin/tmux' "${file}" 2>/dev/null \
+  || echo '#if ([[ -z "$TMUX" && -n "$SSH_CONNECTION" ]]); then /usr/bin/tmux attach || /usr/bin/tmux new; fi' >> "${file}"   # If not already in tmux and via SSH
+#--- Configure zsh (themes) ~ https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+#sed -i 's/ZSH_THEME=.*/ZSH_THEME="mh"/' "${file}"   # Other themes: mh, jreese,   alanpeabody,   candy,   terminalparty, kardan,   nicoulaj, sunaku
+#--- Configure oh-my-zsh
+sed -i 's/plugins=(.*)/plugins=(git git-extras tmux dirhistory python pip)/' "${file}"
+#--- Set zsh as default shell (current user)
+chsh -s "$(which zsh)"
+
+##### Install seclist
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}seclist${RESET} ~ multiple types of (word)lists (and similar things)"
+apt -y -qq install seclists \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Link to others
+apt -y -qq install wordlists \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+[ -e /usr/share/seclists ] \
+  && ln -sf /usr/share/seclists /usr/share/wordlists/seclists
+
+##### Update wordlists
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Updating ${GREEN}wordlists${RESET} ~ collection of wordlists"
+apt -y -qq install wordlists curl \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Extract rockyou wordlist
+[ -e /usr/share/wordlists/rockyou.txt.gz ] \
+  && gzip -dc < /usr/share/wordlists/rockyou.txt.gz > /usr/share/wordlists/rockyou.txt
+#--- Add 10,000 Top/Worst/Common Passwords
+mkdir -p /usr/share/wordlists/
+(curl --progress -k -L -f "http://xato.net/files/10k most common.zip" > /tmp/10kcommon.zip 2>/dev/null \
+  || curl --progress -k -L -f "http://download.g0tmi1k.com/wordlists/common-10k_most_common.zip" > /tmp/10kcommon.zip 2>/dev/null) \
+  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 10kcommon.zip" 1>&2
+unzip -q -o -d /usr/share/wordlists/ /tmp/10kcommon.zip 2>/dev/null   #***!!! hardcoded version! Need to manually check for updates
+mv -f /usr/share/wordlists/10k{\ most\ ,_most_}common.txt
+#--- Linking to more - folders
+[ -e /usr/share/dirb/wordlists ] \
+  && ln -sf /usr/share/dirb/wordlists /usr/share/wordlists/dirb
+#--- Extract sqlmap wordlist
+unzip -o -d /usr/share/sqlmap/txt/ /usr/share/sqlmap/txt/wordlist.zip
+ln -sf /usr/share/sqlmap/txt/wordlist.txt /usr/share/wordlists/sqlmap.txt
+#--- Not enough? Want more? Check below!
+#apt search wordlist
+#find / \( -iname '*wordlist*' -or -iname '*passwords*' \) #-exec ls -l {} \;
+
+##### Install checksec
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}checksec${RESET} ~ check *nix OS for security features"
+apt -y -qq install curl \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+mkdir -p /usr/share/checksec/
+file=/usr/share/checksec/checksec.sh
+timeout 300 curl --progress -k -L -f "http://www.trapkit.de/tools/checksec.sh" > "${file}" \
+  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading checksec.sh" 1>&2     #***!!! hardcoded patch
+chmod +x "${file}"
+
+##### Install CMSmap
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CMSmap${RESET} ~ CMS detection"
+apt -y -qq install git \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+git clone -q -b master https://github.com/Dionach/CMSmap.git /opt/cmsmap-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/cmsmap-git/ >/dev/null
+git pull -q
+popd >/dev/null
+#--- Add to path
+mkdir -p /usr/local/bin/
+file=/usr/local/bin/cmsmap-git
+cat <<EOF > "${file}" \
+  || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
+#!/bin/bash
+cd /opt/cmsmap-git/ && python cmsmap.py "\$@"
+EOF
+chmod +x "${file}"
+
+##### Install droopescan
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}DroopeScan${RESET} ~ Drupal vulnerability scanner"
+apt -y -qq install git \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+git clone -q -b master https://github.com/droope/droopescan.git /opt/droopescan-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/droopescan-git/ >/dev/null
+git pull -q
+popd >/dev/null
+#--- Add to path
+mkdir -p /usr/local/bin/
+file=/usr/local/bin/droopescan-git
+cat <<EOF > "${file}" \
+  || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
+#!/bin/bash
+cd /opt/droopescan-git/ && python droopescan "\$@"
+EOF
+chmod +x "${file}"
+
+##### Install nbtscan ~ http://unixwiz.net/tools/nbtscan.html vs http://inetcat.org/software/nbtscan.html (see http://sectools.org/tool/nbtscan/)
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}nbtscan${RESET} (${GREEN}inetcat${RESET} & ${GREEN}unixwiz${RESET}) ~ netbios scanner"
+#--- inetcat - 1.5.x
+apt -y -qq install nbtscan \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Examples
+#nbtscan -r 192.168.0.1/24
+#nbtscan -r 192.168.0.1/24 -v
+#--- unixwiz - 1.0.x
+mkdir -p /usr/local/src/nbtscan-unixwiz/
+timeout 300 curl --progress -k -L -f "http://unixwiz.net/tools/nbtscan-source-1.0.35.tgz" > /usr/local/src/nbtscan-unixwiz/nbtscan.tgz \
+  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading nbtscan.tgz" 1>&2    #***!!! hardcoded version! Need to manually check for updates
+tar -zxf /usr/local/src/nbtscan-unixwiz/nbtscan.tgz -C /usr/local/src/nbtscan-unixwiz/
+pushd /usr/local/src/nbtscan-unixwiz/ >/dev/null
+make -s clean;
+make -s 2>/dev/null    # bad, I know
+popd >/dev/null
+#--- Add to path
+mkdir -p /usr/local/bin/
+ln -sf /usr/local/src/nbtscan-unixwiz/nbtscan /usr/local/bin/nbtscan-uw
+#--- Examples
+#nbtscan-uw -f 192.168.0.1/24
+
+
+##### Setup tftp client & server
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting up ${GREEN}tftp client${RESET} & ${GREEN}server${RESET} ~ file transfer methods"
+apt -y -qq install tftp atftpd \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Configure atftpd
+file=/etc/default/atftpd; [ -e "${file}" ] && cp -n $file{,.bkup}
+echo -e 'USE_INETD=false\nOPTIONS="--tftpd-timeout 300 --retry-timeout 5 --maxthread 100 --verbose=5 --daemon --port 69 /var/tftp"' > "${file}"
+mkdir -p /var/tftp/
+chown -R nobody\:root /var/tftp/
+chmod -R 0755 /var/tftp/
+#--- Setup alias
+file=~/.bash_aliases; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/bash.bash_aliases
+([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+grep -q '^## tftp' "${file}" 2>/dev/null \
+  || echo -e '## tftp\nalias tftproot="cd /var/tftp/"\n' >> "${file}"
+#--- Apply new alias
+source "${file}" || source ~/.zshrc
+#--- Remove from start up
+systemctl disable atftpd
+#--- Disabling IPv6 can help
+#echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+#echo 1 > /proc/sys/net/ipv6/conf/default/disable_ipv6
+
+##### Install vulners.nse script
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Install ${GREEN}vulners.nse${RESET}"
+cd $HOME
+mkdir -p .nmap/scripts
+cd .nmap/scripts
+wget https://raw.githubusercontent.com/vulnersCom/nmap-vulners/master/vulners.nse
+cd $HOME
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Adding i386 architecture support${RESET}"
+dpkg --add-architecture i386
+apt -qq -y update
+apt -qq -y upgrade
+apt -qq -y libc6-dev-i386
+
+##### Clean the system
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cleaning${RESET} the system"
+#--- Clean package manager
+for FILE in clean autoremove; do apt -y -qq "${FILE}"; done
+apt -y -qq purge $(dpkg -l | tail -n +6 | egrep -v '^(h|i)i' | awk '{print $2}')   # Purged packages
+#--- Update slocate database
+updatedb
+#--- Reset folder location
+cd ~/ &>/dev/null
+#--- Remove any history files (as they could contain sensitive info)
+history -cw 2>/dev/null
+for i in $(cut -d: -f6 /etc/passwd | sort -u); do
+  [ -e "${i}" ] && find "${i}" -type f -name '.*_history' -delete
+done
+
+
+
+##### Time taken
+finish_time=$(date +%s)
+echo -e "\n\n ${YELLOW}[i]${RESET} Time (roughly) taken: ${YELLOW}$(( $(( finish_time - start_time )) / 60 )) minutes${RESET}"
+echo -e " ${YELLOW}[i]${RESET} Stages skipped: $(( TOTAL-STAGE ))"
+
+
+#-Done-----------------------------------------------------------------#
+
+
+##### Done!
+echo -e "\n ${YELLOW}[i]${RESET} Don't forget to:"
+echo -e " ${YELLOW}[i]${RESET} + Check the above output (Did everything install? Any errors? (${RED}HINT: What's in RED${RESET}?)"
+echo -e " ${YELLOW}[i]${RESET} + Manually install: Nessus, Nexpose, and/or Metasploit Community"
+echo -e " ${YELLOW}[i]${RESET} + Agree/Accept to: Maltego, OWASP ZAP, w3af, PyCharm, etc"
+echo -e " ${YELLOW}[i]${RESET} + Setup git:   ${YELLOW}git config --global user.name <name>;git config --global user.email <email>${RESET}"
+echo -e " ${YELLOW}[i]${RESET} + ${BOLD}Change default passwords${RESET}: PostgreSQL/MSF, MySQL, OpenVAS, BeEF XSS, etc"
+echo -e " ${YELLOW}[i]${RESET} + ${YELLOW}Reboot${RESET}"
+(dmidecode | grep -iq virtual) \
+  && echo -e " ${YELLOW}[i]${RESET} + Take a snapshot   (Virtual machine detected)"
+
+echo -e '\n'${BLUE}'[*]'${RESET}' '${BOLD}'Done!'${RESET}'\n\a'
+exit 0
