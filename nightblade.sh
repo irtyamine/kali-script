@@ -361,9 +361,10 @@ gsettings set org.gnome.desktop.interface cursor-theme "Breeze_Snow"
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}wallpaper${RESET}"
 mkdir -p ~/.config/wallpaper
-wget -r https://raw.githubusercontent.com/thesp0nge/kali-script/master/wallpaper/ -O ~/.config/wallpaper/
+wget -r https://github.com/thesp0nge/kali-script/raw/master/wallpapers/wallpaper.zip -O ~/.config/wallpaper/wallpaper.zip
+unzip  ~/.config/wallpaper/wallpaper.zip -d  ~/.config/wallpaper
 
-gsettings set org.gnome.desktop.background picture-uri "file:///root/.config/wallpaper/bg_emptiness.jpg"
+gsettings set org.gnome.desktop.background picture-uri "file:///root/.config/wallpaper/teddy-kelley-181683-unsplash.jpg"
 gsettings set org.gnome.desktop.background picture-options "wallpaper"
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}tmux${RESET}"
