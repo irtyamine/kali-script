@@ -13,7 +13,7 @@ YELLOW="\033[01;33m"   # Warnings/Information
 BLUE="\033[01;34m"     # Heading
 BOLD="\033[01;01m"     # Highlight
 RESET="\033[00m"       # Normal
-VERSION="20181205"
+VERSION="20181211"
 
 STAGE=0                                                         # Where are we up to
 TOTAL=$( grep '(${STAGE}/${TOTAL})' $0 | wc -l );(( TOTAL-- ))  # How many things have we got todo
@@ -273,10 +273,11 @@ apt -y -qq install fonts-inconsolata fonts-firacode \
 if [[ $(which gnome-shell) ]]; then
   ##### Configure GNOME 3
   (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}GNOME 3${RESET} ~ desktop environment"
+  apt -y -qq install gnome-shell-extension-dashtodock
   export DISPLAY=:0.0
   #-- Gnome Extension - Dash Dock (the toolbar with all the icons)
   gsettings set org.gnome.shell.extensions.dash-to-dock extend-height true      # Set dock to use the full height
-  gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'LEFT'   # Set dock to the right
+  gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'   # Set dock to the right
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false         # Set dock to be always visible
   gsettings set org.gnome.shell favorite-apps \
     "['gnome-terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'kali-burpsuite.desktop', 'sublime-text.desktop', 'gedit.desktop', 'pycharm.desktop', 'gnome-screenshot.desktop']"
@@ -292,8 +293,8 @@ if [[ $(which gnome-shell) ]]; then
   gsettings set org.gnome.shell.overrides dynamic-workspaces true                          # Static
   gsettings set org.gnome.desktop.wm.preferences num-workspaces 3                          # Increase workspaces count to 3
   #--- Top bar
-  gsettings set org.gnome.desktop.interface clock-show-date true                           # Show date next to time in the top tool bar
-  gsettings set org.gnome.desktop.interface clock-show-seconds true                        # Show seconds next to time in the top tool bar
+  gsettings set org.gnome.desktop.interface clock-show-date false                          # Hide date next to time in the top tool bar
+  gsettings set org.gnome.desktop.interface clock-show-seconds false                       # Hide seconds next to time in the top tool bar
 
 
   gsettings set org.gnome.desktop.interface font-name "Inconsolata Medium 10"
@@ -365,7 +366,7 @@ wget -r https://github.com/thesp0nge/kali-script/raw/master/wallpapers/wallpaper
 unzip  ~/.config/wallpaper/wallpaper.zip -d  ~/.config/wallpaper
 
 gsettings set org.gnome.desktop.background picture-uri "file:///root/.config/wallpaper/teddy-kelley-181683-unsplash.jpg"
-gsettings set org.gnome.desktop.background picture-options "wallpaper"
+gsettings set org.gnome.desktop.background picture-options "zoom"
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}tmux${RESET}"
 apt -y -qq install tmux \
@@ -383,7 +384,7 @@ git clone https://github.com/longld/peda.git ~/peda
 echo "source ~/peda/peda.py" >> ~/.gdbinit
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}pwntools${RESET}"
-pip intall pwntools
+pip install pwntools
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}wpscan${RESET}"
 apt -y -qq install wpscan \
@@ -649,6 +650,7 @@ systemctl disable atftpd
 cd $HOME
 mkdir -p .nmap/scripts
 cd .nmap/scripts
+rm -rf vulners.nse
 wget https://raw.githubusercontent.com/vulnersCom/nmap-vulners/master/vulners.nse
 cd $HOME
 
