@@ -189,6 +189,10 @@ else
   echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping time zone${RESET} (missing: '$0 ${BOLD}--timezone <value>${RESET}')..." 1>&2
 fi
 
+(( STAGE++ )); echo -e " ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}powerline${RESET}"
+apt -y -qq install powerline \ 
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+
 #--- Installing ntp tools
 (( STAGE++ )); echo -e " ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ntpdate${RESET} ~ keeping the time in sync"
 apt -y -qq install ntp ntpdate \
