@@ -301,7 +301,7 @@ if [[ $(which gnome-shell) ]]; then
   gsettings set org.gnome.desktop.wm.preferences titlebar-font "Inconsolata Medium 12"
   gsettings set org.gnome.desktop.background show-desktop-icons false
   #--- Keyboard short-cuts
-  (dmidecode | grep -iq virtual) && gsettings set org.gnome.mutter overlay-key "Alt_R"   # Change 'super' key to right side (rather than left key), if in a VM
+  (dmidecode | grep -iq virtual) && gsettings set org.gnome.mutter overlay-key "Super_L"   
   #--- Hide desktop icon
   dconf write /org/gnome/nautilus/desktop/computer-icon-visible true
 else
