@@ -268,6 +268,13 @@ fi
 apt -y -qq install fonts-inconsolata fonts-firacode \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Gnome terminal NORD colorscheme${RESET}"
+git clone https://github.com/arcticicestudio/nord-gnome-terminal.git $HOME/tmp/nord-gnome-terminal
+bash $HOME/tmp/nord-gnome-terminal/src/nord.sh
+rm -rf $HOME/tmp/nord-gnome-terminal
+
+
+
 
 
 if [[ $(which gnome-shell) ]]; then
@@ -691,6 +698,7 @@ echo -e "\n ${YELLOW}[i]${RESET} Don't forget to:"
 echo -e " ${YELLOW}[i]${RESET} + Check the above output (Did everything install? Any errors? (${RED}HINT: What's in RED${RESET}?)"
 echo -e " ${YELLOW}[i]${RESET} + Manually install: Nessus, Nexpose, and/or Metasploit Community"
 echo -e " ${YELLOW}[i]${RESET} + Agree/Accept to: Maltego, OWASP ZAP, w3af, PyCharm, etc"
+echo -e " ${YELLOW}[i]${RESET} + Set your terminal colorscheme to Nord"
 echo -e " ${YELLOW}[i]${RESET} + Setup git:   ${YELLOW}git config --global user.name <name>;git config --global user.email <email>${RESET}"
 echo -e " ${YELLOW}[i]${RESET} + Please add 'source /usr/share/powerline/bindings/tmux/powerline.conf' to $HOME/.tmux.conf"
 echo -e " ${YELLOW}[i]${RESET} + ${BOLD}Change default passwords${RESET}: PostgreSQL/MSF, MySQL, OpenVAS, BeEF XSS, etc"
