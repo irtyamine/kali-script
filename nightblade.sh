@@ -269,13 +269,22 @@ if [[ $(dmidecode | grep -i virtual) ]]; then
 fi
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}fonts${RESET}"
-apt -y -qq install fonts-inconsolata fonts-firacode \
+apt -y -qq install fonts-inconsolata fonts-firacode fonts-hack fonts-hack-ttf fonts-noto fonts-noto-mono fonts-roboto \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
+mkdir -p $HOME/.config/fonts
+rm -rf $HOME/.fonts
+ln -s $HOME/.config/fonts $HOME/.fonts
+
+wget https://download.damieng.com/fonts/original/EnvyCodeR-PR7.zip -O $HOME/.fonts/envy.zip
+wget https://github.com/pcaro90/hermit/raw/master/packages/otf-hermit-1.21.tar.gz -O $HOME/.fonts/hermit.tar.gz
+tar xfvz --overwrite $HOME/.fonts/hermit.tar.gz -C $HOME/.fonts
+unzip $HOME/.fonts/envy.zip -d $HOME/.fonts
+
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Gnome terminal NORD colorscheme${RESET}"
-git clone https://github.com/arcticicestudio/nord-gnome-terminal.git $HOME/tmp/nord-gnome-terminal
-bash $HOME/tmp/nord-gnome-terminal/src/nord.sh
-rm -rf $HOME/tmp/nord-gnome-terminal
+git clone https://github.com/arcticicestudio/nord-gnome-terminal.git /tmp/nord-gnome-terminal
+bash /tmp/nord-gnome-terminal/src/nord.sh
+rm -rf /tmp/nord-gnome-terminal
 
 
 
@@ -360,10 +369,11 @@ grep -q '^file:///tmp ' "${file}" 2>/dev/null \
 
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Cloning ${GREEN}QOGIR GTK/GNOME-SHELL theme${RESET}"
-rm -rf ~/Qogir-theme
+rm -rf /tmp/Qogir-theme
 rm -rf /usr/share/themes/Qogir*
-git clone https://github.com/vinceliuice/Qogir-theme.git
-~/Qogir-theme/install.sh
+git clone https://github.com/vinceliuice/Qogir-theme.git /tmp/Qogir-theme
+/tmp/Qogir-theme/install.sh
+
 gsettings set org.gnome.desktop.interface gtk-theme "Qogir-win-light"
 gsettings set org.gnome.shell.extensions.user-theme name "Qogir-win-light"
 
@@ -391,8 +401,9 @@ cp .tmux/.tmux.conf.local .
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}peda${RESET}"
 rm -rf .gdbinit
-git clone https://github.com/longld/peda.git ~/peda
-echo "source ~/peda/peda.py" >> ~/.gdbinit
+rm -rf /opt/peda
+git clone https://github.com/longld/peda.git /opt/peda
+echo "source /opt/peda/peda.py" >> ~/.gdbinit
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}pwntools${RESET}"
 pip install pwntools
