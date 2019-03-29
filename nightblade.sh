@@ -278,8 +278,17 @@ ln -s $HOME/.config/fonts $HOME/.fonts
 
 wget https://download.damieng.com/fonts/original/EnvyCodeR-PR7.zip -O $HOME/.fonts/envy.zip
 wget https://github.com/pcaro90/hermit/raw/master/packages/otf-hermit-1.21.tar.gz -O $HOME/.fonts/hermit.tar.gz
+wget https://cdn.rawgit.com/larsenwork/monoid/2db2d289f4e61010dd3f44e09918d9bb32fb96fd/Monoid.zip -O $HOME/.fonts/Monoid.zip
 tar xfvz --overwrite $HOME/.fonts/hermit.tar.gz -C $HOME/.fonts
 unzip $HOME/.fonts/envy.zip -d $HOME/.fonts
+unzip $HOME/.fonts/Monoid.zip -d $HOME/.fonts
+
+rm $HOME/.fonts/*.zip
+rm $HOME/.fonts/*.tar.gz
+
+gsettings set org.gnome.desktop.interface font-name 'Monoid Regular 10'
+gsettings set org.gnome.desktop.interface font-name 'Monoid Regular 8'
+
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Gnome terminal NORD colorscheme${RESET}"
 git clone https://github.com/arcticicestudio/nord-gnome-terminal.git /tmp/nord-gnome-terminal
