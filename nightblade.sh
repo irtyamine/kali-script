@@ -383,10 +383,9 @@ gsettings set org.gnome.desktop.interface cursor-theme "Breeze_Snow"
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}wallpaper${RESET}"
 mkdir -p ~/.config/wallpaper
-wget -r https://github.com/thesp0nge/kali-script/raw/master/wallpapers/wallpaper.zip -O ~/.config/wallpaper/wallpaper.zip
-unzip  ~/.config/wallpaper/wallpaper.zip -d  ~/.config/wallpaper
+wget -r https://unsplash.com/photos/ZytvP7_lfBs/download?force=true -O ~/.config/wallpaper/wallpaper.jpg
 
-gsettings set org.gnome.desktop.background picture-uri "file:///root/.config/wallpaper/teddy-kelley-181683-unsplash.jpg"
+gsettings set org.gnome.desktop.background picture-uri "file:///root/.config/wallpaper/wallpaper.jpg"
 gsettings set org.gnome.desktop.background picture-options "zoom"
 
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}tmux${RESET}"
@@ -681,6 +680,11 @@ dpkg --add-architecture i386
 apt -qq -y update
 apt -qq -y upgrade
 apt -qq -y libc6-dev-i386
+
+##### Install mingw
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Install ${GREEN}MinGW - W64${RESET}"
+apt -y -qq install mingw-w64
+
 
 ##### Clean the system
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cleaning${RESET} the system"
