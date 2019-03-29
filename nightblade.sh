@@ -381,6 +381,7 @@ gsettings set org.gnome.shell.extensions.user-theme name "Qogir-win-light"
 apt install breeze-cursor-theme
 gsettings set org.gnome.desktop.interface cursor-theme "Breeze_Snow"
 
+# Wallpaper Photo by Kirill Pershin on Unsplash
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}wallpaper${RESET}"
 mkdir -p ~/.config/wallpaper
 wget -r https://unsplash.com/photos/ZytvP7_lfBs/download?force=true -O ~/.config/wallpaper/wallpaper.jpg
@@ -685,6 +686,15 @@ apt -qq -y libc6-dev-i386
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Install ${GREEN}MinGW - W64${RESET}"
 apt -y -qq install mingw-w64
 
+mkdir -p $HOME/src/hacking
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cloning shellerate${RESET}"
+git clone https://github.com/thesp0nge/shellerate.git $HOME/src/hacking/shellerate
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cloning toolbox${RESET}"
+git clone https://github.com/thesp0nge/toolbox.git $HOME/src/hacking/toolbox
+
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cloning templates${RESET}"
+git clone https://github.com/thesp0nge/templates.git $HOME/src/hacking/templates
 
 ##### Clean the system
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cleaning${RESET} the system"
