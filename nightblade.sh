@@ -515,6 +515,9 @@ grep -q '^## grc traceroute alias' "${file}" 2>/dev/null \
   || echo -e "## grc traceroute alias\nalias traceroute='$(which grc) $(which traceroute)'\n" >> "${file}"
 grep -q '^## grc wdiff alias' "${file}" 2>/dev/null \
   || echo -e "## grc wdiff alias\nalias wdiff='$(which grc) $(which wdiff)'\n" >> "${file}"
+grep -q '^## grc ipa alias' "${file}" 2>/dev/null \
+  || echo -e "## grc ipa alias\nalias ipa='$(which ip) --brief --color a'\n" >> "${file}"
+
 #configure  #esperanto  #ldap  #e  #cvs  #log  #mtr  #ls  #irclog  #mount2  #mount
 #--- Apply new aliases
 source "${file}" || source ~/.zshrc
